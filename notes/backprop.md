@@ -27,7 +27,9 @@ $$
 \dfrac{\partial c}{\partial a} = \dfrac{\partial (a+b)}{\partial a} = 1
 $$
 
-similarly: $$\dfrac{\partial c}{\partial b} = 1$ and $\dfrac{\partial d}{\partial b} = 1$$
+similarly: 
+
+$$\dfrac{\partial c}{\partial b} = 1$ and $\dfrac{\partial d}{\partial b} = 1$$
 
 computing the partial derivatives from the second to third layer is a similar process.
 
@@ -35,6 +37,8 @@ $$
 \dfrac{\partial e}{\partial c} = \dfrac{\partial (c*d)}{\partial c} = d
 $$
 
-similarly: $$\dfrac{\partial e}{\partial d} = c$$
+similarly: 
+
+$$\dfrac{\partial e}{\partial d} = c$$
 
 
