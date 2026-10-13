@@ -1,6 +1,6 @@
 from engine.scalar import Value
 
-def g():
+def f():
     a = Value(2)
     b = Value(-3)
     c = Value(5)
@@ -16,4 +16,4 @@ def g():
     print(a,b,c)
 
 if __name__ == "__main__":
-    g()
+    f()
