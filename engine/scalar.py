@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import List
 
 class Value:
     def __init__(self, data: float, children: map[Value, float] = {}):
@@ -44,7 +45,7 @@ class Value:
         dfs(self)
         return ordered[::-1]
 
-    def backwards(self) -> float:
+    def backwards(self) -> None:
         ll = self.topological()
 
         for x in ll:
