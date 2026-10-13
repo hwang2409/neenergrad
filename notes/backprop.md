@@ -29,7 +29,9 @@ $$
 
 similarly: 
 
-$$\dfrac{\partial c}{\partial b} = 1$ and $\dfrac{\partial d}{\partial b} = 1$$
+$$\dfrac{\partial c}{\partial b} = 1$$ 
+
+$$\dfrac{\partial d}{\partial b} = 1$$
 
 computing the partial derivatives from the second to third layer is a similar process.
 
