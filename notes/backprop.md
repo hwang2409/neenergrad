@@ -59,5 +59,5 @@ $$
 $$
 
 $$
-\implies \dfrac{\partial e}{\partial a} = 1 * d(a) + 0 * ca = d(a) = b+1
+\implies \dfrac{\partial e}{\partial a} = 1 * d(a) + 0 * c(a) = d(a) = b+1
 $$
