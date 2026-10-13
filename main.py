@@ -1,19 +1,16 @@
 from engine.scalar import Value
 
 def f():
-    x = Value(1)
-    y = Value(2)
-    z = Value(3)
+    a = Value(2)
+    b = Value(1)
+    c = a+b
+    d = b+1
+    e = c*d
 
-    a = x+y
-    b = a*z
-    c = y**2
-    f = b+c
+    e.grad = 1
+    e.backwards()
 
-    f.grad = 1
-    f.backwards()
-
-    print(x, y, z)
+    print(a,b,c)
 
 if __name__ == "__main__":
     f()
