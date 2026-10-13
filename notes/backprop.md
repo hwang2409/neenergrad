@@ -75,3 +75,21 @@ $$
 $$
 = b + 1
 $$
+
+similarly:
+
+$$
+\dfrac{\partial e}{\partial b} = \dfrac{\partial e}{\partial c} \cdot \dfrac{\partial c}{\partial b} + \dfrac{\partial e}{\partial d} \cdot \dfrac{\partial d}{\partial b}
+$$
+
+$$
+= (d) \cdot (1) + (c) \cdot 1
+$$
+
+$$
+= d + c
+$$
+
+$$
+= a + 2b + 1
+$$
