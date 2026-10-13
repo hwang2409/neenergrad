@@ -11,7 +11,7 @@ let: $c = (a * b)$ and $d = (b+1)$, we now have $e = c*d$
 
 ```mermaid
 flowchart LR
-A(["$a$"])
+A(["a"])
 B(["b"])
 A --> C["c=a+b"]
 B --> C
