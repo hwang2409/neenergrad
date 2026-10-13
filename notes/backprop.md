@@ -20,7 +20,7 @@ C --> E["e=c*d"]
 D --> E
 ```
 
-## derivatives
+## partial derivatives
 lets now compute the derivatives of the graph going from left to right. since a and b are both scalars, computing partial derivatives should be relatively simple.
 
 $$
@@ -43,4 +43,21 @@ similarly:
 
 $$\dfrac{\partial e}{\partial d} = c$$
 
+### chain rule
+lets now think about how $a$ and $b$ affect $e$
 
+$$
+\dfrac{\partial e}{\partial a} = \dfrac{\partial (c*d)}{\partial a}
+$$
+
+$$
+\implies \dfrac{\partial e}{\partial a} = \dfrac{\partial [c(a) * d(a)]}{\partial a} 
+$$
+
+$$
+\implies \dfrac{\partial e}{\partial a} = \dfrac{\partial c(a)}{\partial a} * d(a) + \dfrac{\partial d(a)}{\partial a} * c(a)
+$$
+
+$$
+\implies \dfrac{\partail e}{\partial a} = 1 * d(a) + 0 * ca = d(a) = b+1
+$$
