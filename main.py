@@ -2,13 +2,16 @@ from engine.scalar import Value
 
 def f():
     a = Value(2)
-    b = Value(1)
-    c = a+b
-    d = b+1
-    e = c*d
+    b = Value(-3)
+    c = Value(5)
 
-    e.grad = 1
-    e.backwards()
+    d = a*b
+    e = b+c
+    f = d*e
+    g = c*e
+    L = f+g
+
+    L.backwards()
 
     print(a,b,c)
 
