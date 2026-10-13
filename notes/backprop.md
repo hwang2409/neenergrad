@@ -83,7 +83,7 @@ $$
 $$
 
 $$
-= (d) \cdot (1) + (c) \cdot 1
+= (d) \cdot (1) + (c) \cdot (1)
 $$
 
 $$
@@ -93,3 +93,7 @@ $$
 $$
 = a + 2b + 1
 $$
+
+visually, this can be derived by summing up the product of all the paths from $b \rightarrow e$
+
+## forward mode differentiation
