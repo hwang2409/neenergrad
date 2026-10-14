@@ -1,19 +1,15 @@
 from engine.scalar import Value
+from data.dataset import Dataset
+from visualization.plot import Plot
 
 def f():
-    a = Value(2)
-    b = Value(-3)
-    c = Value(5)
+    plot = Plot(6,6)
 
-    d = a*b
-    e = b+c
-    f = d*e
-    g = c*e
-    L = f+g
+    moons = Dataset.make_moons(100)
+    xs, ys, labels = zip(*moons)
 
-    L.backwards()
-
-    print(a,b,c)
+    plot.scatter(xs, ys, color=labels, cmap="coolwarm")
+    plot.show()
 
 if __name__ == "__main__":
     f()
