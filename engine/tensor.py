@@ -3,68 +3,107 @@ import numpy.typing as npt
 from collections import defaultdict
 
 class Tensor:
-    def __init__(self, data: npt.ArrayLike, children: dict[Tensor, npt.ArrayLike] = None):
+    def __init__(self, data: npt.ArrayLike, _children: set[Tensor] = None):
         self.data = np.asarray(data, dtype=np.float64)
-        self.children = children if children is not None else {}
+        self.children = set(_children) if _children else set()
         self.shape = self.data.shape
         self.grad = np.zeros(self.shape)
+        self._backward = lambda: None
 
     def __add__(self, other: Tensor) -> Tensor:
-        if self is other:
-            return Tensor(2 * self.data, { self: np.full(self.shape, 2) })
+        out = Tensor(self.data + other.data, (self, other))
 
-        return Tensor(self.data + other.data,{ self: np.full(self.shape, 1), other: np.full(self.shape, 1) })
+        def _backward():
+            self.grad += self.unbroadcast(out.grad, self.shape)
+            other.grad += self.unbroadcast(out.grad, other.shape)
+        out._backward = _backward
+        return out
 
     def __mul__(self, other: Tensor) -> Tensor:
-        if self is other:
-            return self.__pow__(2)
+        out = Tensor(self.data * other.data, (self, other))
 
-        return Tensor(self.data * other.data, { self: other.data.copy(), other: self.data.copy() })
+        def _backward():
+            self.grad += self.unbroadcast(out.grad * other.data, self.shape)
+            other.grad += self.unbroadcast(out.grad * self.data, other.shape)
+        out._backward = _backward
+        return out
 
     def __sub__(self, other: Tensor) -> Tensor:
-        if self is other:
-            return Tensor.fill(self.shape, 0)
+        out = Tensor(self.data - other.data, (self, other))
 
-        return Tensor(self.data - other.data, { self: np.full(self.shape, 1), other: np.full(self.shape, -1) })
+        def _backward():
+            self.grad += self.unbroadcast(out.grad, self.shape)
+            other.grad += self.unbroadcast(-out.grad, other.shape)
+        out._backward = _backward
+        return out
 
     def __pow__(self, exp: int) -> Tensor:
-        if exp == 0:
-            return Tensor.fill(self.shape, 1)
+        out = Tensor(np.power(self.data, exp), (self,))
 
-        return Tensor(np.power(self.data, exp), { self: exp * np.power(self.data, exp-1) })
+        def _backward():
+            self.grad += self.unbroadcast(out.grad * exp * np.power(self.data, exp-1), self.shape)
+        out._backward = _backward
+        return out
 
     def __truediv__(self, other: Tensor) -> Tensor:
-        if self is other:
-            return Tensor.fill(self.shape, 1)
+        out = Tensor(self.data / other.data, (self, other))
 
-        return Tensor(self.data / other.data, { self: np.full(self.shape, 1) / other.data, other: -self.data / (other.data * other.data) })
+        def _backward():
+            self.grad += self.unbroadcast(out.grad / other.data, self.shape)
+            other.grad += self.unbroadcast(out.grad * (-self.data / (other.data * other.data)), other.shape)
+        out._backward = _backward
+        return out
 
     def exp(self) -> Tensor:
         x = np.exp(self.data)
-        return Tensor(x, { self: x })
+        out = Tensor(x, (self,))
+
+        def _backward():
+            self.grad += self.unbroadcast(out.grad * x, self.shape)
+        out._backward = _backward
+        return out
 
     def log(self) -> Tensor:
         assert(np.all(self.data > 0))
-        return Tensor(np.log(self.data), { self: 1 / self.data })
+        out = Tensor(np.log(self.data), (self,))
+
+        def _backward():
+            self.grad += self.unbroadcast(out.grad / self.data, self.shape)
+        out._backward = _backward
+        return out
 
     def tanh(self) -> Tensor:
         x = np.tanh(self.data)
+        out = Tensor(x, (self,))
 
-        return Tensor(x, { self: np.full(self.shape, 1) - x*x })
+        def _backward():
+            self.grad += self.unbroadcast(out.grad * (np.full(self.shape, 1) - x*x), self.shape)
+        out._backward = _backward
+        return out
 
     def relu(self) -> Tensor:
-        return Tensor(np.maximum(0, self.data), { self: (self.data > 0).astype(float) })
+        out = Tensor(np.maximum(0, self.data), (self,))
 
-    def __neg__(self):
+        def _backward():
+            self.grad += self.unbroadcast(out.grad * (self.data > 0).astype(float), self.shape)
+        out._backward = _backward
+        return out
+
+    def __neg__(self) -> Tensor:
         return self.__mul__(Tensor.fill(self.shape, -1))
 
     def __repr__(self) -> str:
         return f"Tensor(shape={self.shape}, data={self.data})"
 
     def sum(self) -> Tensor:
-        return Tensor(np.sum(self.data), { self: np.full(self.shape, 1) })
+        out = Tensor(np.sum(self.data), (self,))
 
-    def topological(self) -> List[Tensor]:
+        def _backward():
+            self.grad += self.unbroadcast(out.grad, self.shape)
+        out._backward = _backward
+        return out
+
+    def topo(self) -> List[Tensor]:
         visited = defaultdict(bool)
         ll = []
 
@@ -80,16 +119,11 @@ class Tensor:
         return ll[::-1]
 
     def backwards(self) -> None:
-        ll = self.topological()
+        ll = self.topo()
 
-        for x in ll:
-            if x is self:
-                x.grad = np.ones(self.shape)
-
-            for child in x.children:
-                cgrad = x.grad * x.children[child]
-                normalized = Tensor.unbroadcast(cgrad, child.shape)
-                child.grad += normalized
+        self.grad = np.ones(self.shape)
+        for tensor in ll:
+            tensor._backward()
 
     @classmethod
     def unbroadcast(cls, grad: np.ndarray, cshape: tuple[int, ...]):
