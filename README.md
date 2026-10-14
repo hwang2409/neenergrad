@@ -15,7 +15,7 @@ python3 -m examples.regression
 two moon mlp
 
 ```
-python3 -m examples.two_moon
+python3 -m examples.two_moons
 ```
 
 ![two moons](src/two_moons.png)
