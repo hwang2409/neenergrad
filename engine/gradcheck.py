@@ -71,7 +71,7 @@ class Gradcheck:
                 data.flat[i] = value
                 numeric = (o0 - o1) / (2*h)
                 num_grads.flat[i] = numeric
-                params[idx] = tensor
+            params[idx] = tensor
             numeric_grads[tensor] = num_grads
 
         for p in params:
