@@ -55,7 +55,7 @@ def f():
             pointx, pointy = px[itx][ity], py[itx][ity]
             score = mlp([pointx, pointy])[0].data
             z[itx].append(score)
-    plot.contour(px,py,z,levels=[-100,0,+100])
+    plot.contour(px,py,z,levels=[-100,0,+100], cmap="coolwarm", alpha=0.3)
     plot.scatter(xs, ys, color=labels, cmap="coolwarm")
     plot.show()
 
