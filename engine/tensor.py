@@ -54,6 +54,15 @@ class Tensor:
         out._backward = _backward
         return out
 
+    def __matmul__(self, other: Tensor) -> Tensor:
+        out = Tensor(self.data @ other.data, (self, other))
+
+        def _backward():
+            self.grad += self.unbroadcast(out.grad @ np.swapaxes(other.data, -1, -2), self.shape)
+            other.grad += self.unbroadcast(np.swapaxes(self.data, -1, -2) @ out.grad, other.shape)
+        out._backward = _backward
+        return out
+
     def exp(self) -> Tensor:
         x = np.exp(self.data)
         out = Tensor(x, (self,))
@@ -99,7 +108,7 @@ class Tensor:
         out = Tensor(np.sum(self.data), (self,))
 
         def _backward():
-            self.grad += self.unbroadcast(out.grad, self.shape)
+            self.grad += out.grad * np.ones(self.shape)
         out._backward = _backward
         return out
 
