@@ -1,7 +1,7 @@
-from engine.scalar import Value
+from engine.value import Value
+from engine.tensor import Tensor
 from data.dataset import Dataset
 from visualization.plot import Plot
-from engine.tensor import Tensor
 
 def f():
     pass

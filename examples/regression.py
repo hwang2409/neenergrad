@@ -1,4 +1,4 @@
-from engine.scalar import Value
+from engine.value import Value
 import numpy as np
 
 def fit():

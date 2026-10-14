@@ -1,8 +1,8 @@
-from collections.abc import Callable
-from engine.scalar import Value
-from engine.tensor import Tensor
-from typing import List
 import numpy as np
+from typing import List
+from collections.abc import Callable
+from engine.value import Value
+from engine.tensor import Tensor
 
 class Gradcheck:
     def __init__(self):

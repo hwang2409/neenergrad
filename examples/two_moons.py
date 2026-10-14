@@ -1,9 +1,10 @@
-from engine.scalar import Value
-from engine.mlp import MLP
+import numpy as np
+from typing import List
 from data.dataset import Dataset
 from visualization.plot import Plot
-from typing import List
-import numpy as np
+
+from engine.nn import MLP
+from engine.value import Value
 
 def accuracy(mlp: MLP, moons: List[tuple[float, float, int]]):
     cnt = 0
