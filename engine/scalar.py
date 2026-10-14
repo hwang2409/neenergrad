@@ -3,7 +3,7 @@ from typing import List
 import math
 
 class Value:
-    def __init__(self, data: float, children: map[Value, float] = {}):
+    def __init__(self, data: float, children: dict[Value, float] = {}):
         self.data = data
         self.children = children
         self.grad = 0

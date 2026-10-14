@@ -8,7 +8,7 @@ class Dataset:
         pass
 
     @classmethod
-    def make_moons(self, points: int, noise: bool = True) -> List[tuple[float, float, int]]:
+    def make_moons(cls, points: int, noise: bool = True) -> List[tuple[float, float, int]]:
         trange = np.linspace(0, math.pi, num=points//2)
 
         m0, m1 = [], []
