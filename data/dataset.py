@@ -9,7 +9,7 @@ class Dataset:
 
     @classmethod
     def make_moons(self, points: int, noise: bool = True) -> List[tuple[float, float, int]]:
-        trange = np.linspace(0, math.pi, num=(points//2))
+        trange = np.linspace(0, math.pi, num=points//2)
 
         m0, m1 = [], []
         for t in trange:
