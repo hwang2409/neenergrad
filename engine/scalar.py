@@ -9,40 +9,30 @@ class Value:
         self.grad = 0
 
     def __mul__(self, other: Value) -> Value:
-        if self is other:
-            return Value(self.data * self.data, { self: 2*self.data })
-        if not isinstance(other, Value):
-            other = Value(other)
-        return Value(self.data * other.data, { self: other.data, other: self.data })
+        other = other if isinstance(other, Value) else Value(other)
+
+        return (Value(self.data * other.data, { self: other.data, other: self.data }) if self is not other 
+                else Value(self.data * self.data, { self: 2 * self.data }))
 
     def __add__(self, other: Value) -> Value:
-        if self is other:
-            return Value(2*self.data, { self: 2 })
-        if not isinstance(other, Value):
-            other = Value(other)
-        return Value(self.data + other.data, { self: 1.0, other: 1.0 })
+        other = other if isinstance(other, Value) else Value(other)
+
+        return (Value(self.data + other.data, { self: 1, other: 1 }) if self is not other
+                else Value(2*self.data, { self: 2 }))
 
     def __sub__(self, other: Value) -> Value:
-        if self is other:
-            return Value(0)
-        if not isinstance(other, Value):
-            other = Value(other)
-        return Value(self.data - other.data, { self: 1.0, other: -1.0 })
+        other = other if isinstance(other, Value) else Value(other)
+        return (Value(self.data - other.data, { self: 1, other: -1 }) if self is not other
+                else Value(0))
 
     def __pow__(self, other: int) -> Value:
-        if other == 0:
-            return Value(1)
-
-        result = self.data ** other
-        return Value(result, { self: other * (self.data ** (other-1)) })
+        return (Value(self.data ** other, { self: other * (self.data ** (other-1)) }) if other != 0
+                else Value(1))
 
     def __truediv__(self, other: Value) -> Value:
-        if not isinstance(other, Value):
-            other = Value(other)
-        assert(other.data != 0)
-        if self is other:
-            return Value(1)
-        return Value(self.data / other.data, { self: 1/other.data, other: -self.data / (other.data*other.data) })
+        other = other if isinstance(other, Value) else Value(other)
+        return (Value(1) if self is other 
+                else Value(self.data / other.data, { self: 1/other.data, other: -self.data / (other.data*other.data) }))
 
     def exp(self) -> Value:
         x = math.exp(self.data)
