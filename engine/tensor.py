@@ -10,24 +10,18 @@ class Tensor:
         self.grad = np.zeros(self.shape)
 
     def __add__(self, other: Tensor) -> Tensor:
-        assert(self.shape == other.shape)
-
         if self is other:
             return Tensor(2 * self.data, { self: np.full(self.shape, 2) })
 
         return Tensor(self.data + other.data,{ self: np.full(self.shape, 1), other: np.full(self.shape, 1) })
 
     def __mul__(self, other: Tensor) -> Tensor:
-        assert(self.shape == other.shape)
-    
         if self is other:
             return self.__pow__(2)
 
         return Tensor(self.data * other.data, { self: other.data.copy(), other: self.data.copy() })
 
     def __sub__(self, other: Tensor) -> Tensor:
-        assert(self.shape == other.shape)
-
         if self is other:
             return Tensor.fill(self.shape, 0)
 
@@ -40,8 +34,6 @@ class Tensor:
         return Tensor(np.power(self.data, exp), { self: exp * np.power(self.data, exp-1) })
 
     def __truediv__(self, other: Tensor) -> Tensor:
-        assert(self.shape == other.shape)
-
         if self is other:
             return Tensor.fill(self.shape, 1)
 
@@ -92,10 +84,24 @@ class Tensor:
 
         for x in ll:
             if x is self:
-                x.grad = np.full(self.shape, 1)
+                x.grad = np.ones(self.shape)
 
             for child in x.children:
-                child.grad += x.grad * x.children[child]
+                cgrad = x.grad * x.children[child]
+                normalized = Tensor.unbroadcast(cgrad, child.shape)
+                child.grad += normalized
+
+    @classmethod
+    def unbroadcast(cls, grad: np.ndarray, cshape: tuple[int, ...]):
+        L = len(cshape)
+        while len(grad.shape) > L:
+            grad = grad.sum(axis=0)
+
+        for axis in range(L):
+            if cshape[axis] == 1:
+                grad = grad.sum(axis=axis, keepdims=True)
+
+        return grad
 
     @classmethod
     def zeros(cls, shape: tuple[int, ...]) -> Tensor:
