@@ -43,11 +43,11 @@ def train(moons: List[tuple[float, float, int]], steps: int = 100):
 
 def f():
     plot = Plot(6,6)
-    moons = Dataset.make_moons(200)
-    mlp = train(moons, 100)
+    moons = Dataset.make_moons(300)
+    mlp = train(moons, 150)
 
     xs, ys, labels = zip(*moons)
-    x,y,z = np.linspace(min(xs), max(xs), 50), np.linspace(min(ys), max(ys), 50), []
+    x,y,z = np.linspace(min(xs), max(xs), 100), np.linspace(min(ys), max(ys), 100), []
     px, py = np.meshgrid(x,y)
 
     for itx in range(len(px)):
@@ -61,6 +61,7 @@ def f():
     plot.show()
 
     print(f"accuracy: {accuracy(mlp, moons) * 100.0}%")
+    plot.save("/tmp/two_moons.png")
     
 if __name__ == "__main__":
     f()
