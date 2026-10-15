@@ -48,7 +48,7 @@ def main():
              )
 
     training_size = 60000
-    epochs = 20
+    epochs = 3
     lr = 0.1
     batch_size = 64
 
