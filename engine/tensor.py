@@ -120,6 +120,22 @@ class Tensor:
 
         return t0/t1
 
+    def reshape(self, shape: tuple[int, ...]) -> Tensor:
+        out = Tensor(np.reshape(self.data, shape), (self,))
+
+        def _backward():
+            self.grad += out.grad.reshape(self.shape)
+        out._backward = _backward
+        return out
+
+    def transpose(self, swap: tuple[int, ...]) -> Tensor:
+        out = Tensor(np.transpose(self.data, swap), (self,))
+
+        def _backward():
+            self.grad += np.transpose(out.grad, np.argsort(swap))
+        out._backward = _backward
+        return out
+
     def topo(self) -> List[Tensor]:
         visited = defaultdict(bool)
         ll = []
