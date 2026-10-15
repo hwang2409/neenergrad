@@ -3,7 +3,7 @@
 
 all of my notes, code and thoughts will be pushed to this repo. everything will be hand written, hand typed, etc. i just want a break from the depths of slop hell.
 
-## examples
+## examples ([scalar engine](engine/value.py)
 ### `examples/regression.py`
 simple model to perform linear regression on the line `y = 3x + 2`
 
@@ -12,7 +12,7 @@ python3 -m examples.regression
 ```
 
 ### `examples/two_moons.py`
-two moon mlp
+two moon mlp 
 
 ```
 python3 -m examples.two_moons
@@ -20,6 +20,7 @@ python3 -m examples.two_moons
 
 ![two moons](src/two_moons.png)
 
+## examples([tensors](engine/tensor.py))
 ### `examples/mnist.py`
 mnist with 98% accuracy (5 epochs)
 
