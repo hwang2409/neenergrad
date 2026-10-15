@@ -4,7 +4,6 @@ import math
 from engine.mlp import MLP
 from engine.tensor import Tensor
 
-
 rng = np.random.default_rng(0)
 
 def parse(f: str) -> np.ndarray:
@@ -49,11 +48,12 @@ def main():
              )
 
     training_size = 60000
-    epochs = 20
+    epochs = 5
     lr = 0.1
     batch_size = 64
 
     for step in range(epochs):
+        X_train = rng.permutations(X_train)
         for k in range(training_size // batch_size + 1):
             start, end = k * batch_size, min((k+1) * (batch_size), training_size)
             X_batch, Y_batch = Tensor(X_train[start:end]), Y_train[start:end]
