@@ -114,6 +114,12 @@ class Tensor:
         out._backward = _backward
         return out
 
+    def mean(self, axis: None|int|tuple[int,...] = None, dims: bool = False) -> Tensor:
+        t0 = self.sum(axis, dims)
+        t1 = Tensor(self.data.size/t0.data.size)
+
+        return t0/t1
+
     def topo(self) -> List[Tensor]:
         visited = defaultdict(bool)
         ll = []
