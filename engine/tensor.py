@@ -104,18 +104,18 @@ class Tensor:
     def __repr__(self) -> str:
         return f"Tensor(shape={self.shape}, data={self.data})"
 
-    def sum(self, axis: None|int|tuple[int,...] = None, dims: bool = False) -> Tensor:
-        out = Tensor(self.data.sum(axis=axis, keepdims=dims), (self,))
+    def sum(self, axis: None|int|tuple[int,...] = None, keepdims: bool = False) -> Tensor:
+        out = Tensor(self.data.sum(axis=axis, keepdims=keepdims), (self,))
 
         def _backward():
-            grad = np.expand_dims(out.grad, axis) if not dims and axis is not None else out.grad
+            grad = np.expand_dims(out.grad, axis) if not keepdims and axis is not None else out.grad
             self.grad += grad * np.ones(self.shape)
 
         out._backward = _backward
         return out
 
-    def mean(self, axis: None|int|tuple[int,...] = None, dims: bool = False) -> Tensor:
-        t0 = self.sum(axis, dims)
+    def mean(self, axis: None|int|tuple[int,...] = None, keepdims: bool = False) -> Tensor:
+        t0 = self.sum(axis, keepdims)
         t1 = Tensor(self.data.size/t0.data.size)
 
         return t0/t1
@@ -135,6 +135,19 @@ class Tensor:
             self.grad += np.transpose(out.grad, np.argsort(swap))
         out._backward = _backward
         return out
+
+    # logsoftmax(x_j) = x_j - log(sum(exp(x)))
+    def log_softmax(self) -> Tensor:
+        c = Tensor(np.max(self.data, axis=-1, keepdims=True))
+        const = (self - c).exp().sum(axis=-1, keepdims=True).log()
+        return (self - c) - const
+
+    # assert labels and batch size are the same
+    def cross_entropy(self, labels: List[int]) -> Tensor:
+        assert(len(labels) == self.shape[0])
+
+        one_hot = Tensor(np.eye(self.shape[-1])[labels])
+        return -((self.log_softmax() * one_hot).sum(axis=-1, keepdims=False)).mean()
 
     def topo(self) -> List[Tensor]:
         visited = defaultdict(bool)
