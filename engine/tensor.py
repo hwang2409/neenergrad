@@ -104,7 +104,7 @@ class Tensor:
     def __repr__(self) -> str:
         return f"Tensor(shape={self.shape}, data={self.data})"
 
-    def sum(self, axis: None|tuple[int,...] = None, dims: bool = False) -> Tensor:
+    def sum(self, axis: None|int|tuple[int,...] = None, dims: bool = False) -> Tensor:
         out = Tensor(self.data.sum(axis=axis, keepdims=dims), (self,))
 
         def _backward():
