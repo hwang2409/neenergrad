@@ -26,3 +26,9 @@ mnist with 98% accuracy (5 epochs)
 ```
 python3 -m examples.mnist
 ```
+
+achieves 89% accuracy on [fashion mnist](https://github.com/zalandoresearch/fashion-mnist) with the same MLP: `examples/fashion_mnist.py`
+
+```
+python3 -m examples.fashion_mnist
+```
