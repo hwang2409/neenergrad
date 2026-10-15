@@ -43,8 +43,8 @@ def train(moons: List[tuple[float, float, int]], steps: int = 100):
 
 def f():
     plot = Plot(6,6)
-    moons = Dataset.make_moons(300)
-    mlp = train(moons, 150)
+    moons = Dataset.make_moons(100)
+    mlp = train(moons, 10)
 
     xs, ys, labels = zip(*moons)
     x,y,z = np.linspace(min(xs), max(xs), 100), np.linspace(min(ys), max(ys), 100), []

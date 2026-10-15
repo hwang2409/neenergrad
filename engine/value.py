@@ -3,51 +3,97 @@ from typing import List
 import math
 
 class Value:
-    def __init__(self, data: float, children: dict[Value, float] = {}):
+    def __init__(self, data: float, _children: set[Value] = None):
         self.data = data
-        self.children = children
+        self.children = set(_children) if _children else set()
         self.grad = 0
+        self._backward = lambda: None
 
     def __mul__(self, other: Value) -> Value:
         other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other))
 
-        return (Value(self.data * other.data, { self: other.data, other: self.data }) if self is not other 
-                else Value(self.data * self.data, { self: 2 * self.data }))
+        def _backward():
+            self.grad += out.grad * other.data
+            other.grad += out.grad * self.data
+        out._backward = _backward
+        return out
 
     def __add__(self, other: Value) -> Value:
         other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other))
 
-        return (Value(self.data + other.data, { self: 1, other: 1 }) if self is not other
-                else Value(2*self.data, { self: 2 }))
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+        return out
 
     def __sub__(self, other: Value) -> Value:
         other = other if isinstance(other, Value) else Value(other)
-        return (Value(self.data - other.data, { self: 1, other: -1 }) if self is not other
-                else Value(0))
+        out = Value(self.data - other.data, (self, other))
 
-    def __pow__(self, other: int) -> Value:
-        return (Value(self.data ** other, { self: other * (self.data ** (other-1)) }) if other != 0
-                else Value(1))
+        def _backward():
+            self.grad += out.grad
+            other.grad -= out.grad
+        out._backward = _backward
+        return out
 
     def __truediv__(self, other: Value) -> Value:
         other = other if isinstance(other, Value) else Value(other)
-        return (Value(1) if self is other 
-                else Value(self.data / other.data, { self: 1/other.data, other: -self.data / (other.data*other.data) }))
+        out = Value(self.data / other.data, (self, other))
+
+        def _backward():
+            self.grad += out.grad / other.data
+            other.grad += out.grad * (-self.data / (other.data * other.data))
+        out._backward = _backward
+        return out
+
+    def __pow__(self, other: int) -> Value:
+        if other == 0:
+            return Value(1)
+
+        out = Value(self.data ** other, (self,))
+
+        def _backward():
+            self.grad += out.grad * (other * (self.data ** (other-1)))
+        out._backward = _backward
+        return out
 
     def exp(self) -> Value:
         x = math.exp(self.data)
-        return Value(x, { self: x })
+        out = Value(x, (self,))
+
+        def _backward():
+            self.grad += out.grad * x
+        out._backward = _backward
+        return out
 
     def log(self) -> Value:
         assert(self.data > 0)
-        return Value(math.log(self.data), { self: 1/self.data })
+        out = Value(math.log(self.data), (self,))
+
+        def _backward():
+            self.grad += out.grad / self.data
+        out._backward = _backward
+        return out
 
     def tanh(self) -> Value:
-        tan = math.tanh(self.data)
-        return Value(tan, { self: 1 - tan*tan })
+        t = math.tanh(self.data)
+        out = Value(t, (self,))
+
+        def _backward():
+            self.grad += out.grad * (1-t*t)
+        out._backward = _backward
+        return out
 
     def relu(self) -> Value:
-        return Value(max(self.data, 0), { self: 1 if self.data > 0 else 0 })
+        out = Value(max(self.data, 0), (self,))
+
+        def _backward():
+            self.grad += out.grad * (1 if self.data > 0 else 0)
+        out._backward = _backward
+        return out
 
     def __radd__(self, other) -> Value:
         return self + other
@@ -61,7 +107,7 @@ class Value:
     def __rtruediv__(self, other) -> Value:
         return Value(other) / self
 
-    def __neg__(self):
+    def __neg__(self) -> Value:
         return self.__mul__(-1)
 
     def __repr__(self) -> str:
@@ -69,25 +115,22 @@ class Value:
 
     def topological(self) -> List[Value]:
         visited = defaultdict(bool)
-        ordered = []
+        ll = []
 
         def dfs(node: Value):
             if visited[node]:
                 return
 
-            for c in node.children:
-                dfs(c)
-            ordered.append(node)
+            for child in node.children:
+                dfs(child)
+            ll.append(node)
             visited[node] = True
         dfs(self)
-        return ordered[::-1]
+        return ll[::-1]
 
     def backwards(self) -> None:
         ll = self.topological()
 
-        for x in ll:
-            if x is self:
-                x.grad = 1
-
-            for c in x.children:
-                c.grad += x.grad * x.children[c]
+        self.grad = 1
+        for value in ll:
+            value._backward()
