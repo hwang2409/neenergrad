@@ -19,3 +19,10 @@ python3 -m examples.two_moons
 ```
 
 ![two moons](src/two_moons.png)
+
+### `examples/mnist.py`
+mnist with 98% accuracy (5 epochs)
+
+```
+python3 -m examples.mnist
+```
