@@ -48,12 +48,14 @@ def main():
              )
 
     training_size = 60000
-    epochs = 5
+    epochs = 20
     lr = 0.1
     batch_size = 64
 
     for step in range(epochs):
-        X_train = rng.permutations(X_train)
+        perms = rng.permutation(len(X_train))
+        X_train = X_train[perms]
+        Y_train = Y_train[perms]
         for k in range(training_size // batch_size + 1):
             start, end = k * batch_size, min((k+1) * (batch_size), training_size)
             X_batch, Y_batch = Tensor(X_train[start:end]), Y_train[start:end]
