@@ -104,11 +104,13 @@ class Tensor:
     def __repr__(self) -> str:
         return f"Tensor(shape={self.shape}, data={self.data})"
 
-    def sum(self) -> Tensor:
-        out = Tensor(np.sum(self.data), (self,))
+    def sum(self, axis: None|tuple[int,...] = None, dims: bool = False) -> Tensor:
+        out = Tensor(self.data.sum(axis=axis, keepdims=dims), (self,))
 
         def _backward():
-            self.grad += out.grad * np.ones(self.shape)
+            grad = np.expand_dims(out.grad, axis) if not dims and axis is not None else out.grad
+            self.grad += grad * np.ones(self.shape)
+
         out._backward = _backward
         return out
 
