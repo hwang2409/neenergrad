@@ -2,6 +2,7 @@ import numpy as np
 import math
 
 from engine.mlp import MLP
+from engine.optim import SGD, Momentum
 from engine.tensor import Tensor
 
 rng = np.random.default_rng(0)
@@ -47,10 +48,13 @@ def main():
                 f = random
              )
 
+    max_acc = 0
     training_size = 60000
-    epochs = 30
+    epochs = 20
     lr = 0.1
     batch_size = 64
+    #optim = SGD(lr=lr, params=mlp.parameters()) 
+    optim = Momentum(lr=lr, params=mlp.parameters())
 
     for step in range(epochs):
         perms = rng.permutation(len(X_train))
@@ -64,16 +68,12 @@ def main():
             entropy = output.cross_entropy(Y_batch)
             entropy.backwards()
 
-            tensors = mlp.parameters()
-
-            for tensor in tensors:
-                tensor.data -= tensor.grad * lr
-
-            mlp.zero_grad()
-
-        print(f"epoch {step}: {entropy.data}")
-
-    print(f"{accuracy(mlp, Tensor(X_test), Y_test) * 100}%")
+            optim.step()
+            optim.zero_grad()
+        acc = accuracy(mlp, Tensor(X_test), Y_test)
+        print(f"epoch [{step}] loss={entropy.data}, accuracy={acc * 100}%")
+        max_acc = max(max_acc, acc)
+    print(f"max accuracy: {max_acc}")
     
 if __name__ == "__main__":
     main()
